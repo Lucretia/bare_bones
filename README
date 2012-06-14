@@ -13,6 +13,14 @@ The full documentation for this project can be found at:
 
   http://wiki.osdev.org/Ada_Bare_bones
 
+Once you have cloned this repository, you need to set up the links to the
+RTS inside rts/boards/i386/adainclude/ to point to those in rts/src/ as follows:
+
+for f in "ada.ads" "a-unccon.ads" "a-uncdea.ads" "gnat.ads" "g-souinf.ads" "interfac.ads" "s-atacco.adb" "s-atacco.ads" "s-maccod.ads" "s-stoele.adb" "s-stoele.ads"
+do
+ln -s `pwd`/rts/src/$f `pwd`/rts/boards/i386/adainclude/$f
+done
+
 --------------------------------------------------------------------------------
 Licence
 --------------------------------------------------------------------------------
