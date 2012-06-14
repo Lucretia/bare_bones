@@ -15,19 +15,28 @@ ASFLAGS		=	--32 -march=i386
 OBJS		=	obj/startup.o obj/multiboot.o obj/console.o
 BOARD		=	pc
 
+OUTDIR		=	disk/boot/
+
 .PHONY: obj/multiboot.o obj/console.o
 
 endif
 
-all: bare_bones
+all: $(OUTDIR)bare_bones
 
-bare_bones: $(OBJS) src/bare_bones.adb
+$(OUTDIR)bare_bones: $(OBJS) src/bare_bones.adb
 	$(GNATMAKE) --RTS=$(RTS_DIR) -XBoard=$(BOARD) -Pbare_bones.gpr
 
 obj/startup.o: src/$(BOARD)/startup.s
 	$(AS) $(ASFLAGS) src/$(BOARD)/startup.s -o obj/startup.o
 
+qemu: boot.iso
+	qemu -cdrom boot.iso
+
+boot.iso: $(OUTDIR)bare_bones
+	grub-mkrescue -o boot.iso disk/
+
 .PHONY: clean
 
 clean:
-	-rm obj/* *~ bare_bones
+	-rm obj/* *~ bare_bones bare_bones.bin
+

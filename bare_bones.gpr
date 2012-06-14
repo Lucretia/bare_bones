@@ -21,7 +21,7 @@ project Bare_Bones is
    end case;
 
    for Object_Dir use "obj";
-   for Exec_Dir use ".";
+   for Exec_Dir use "./disk/boot/";
    for Main use ("bare_bones.adb");
 
    package Builder is
