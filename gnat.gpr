@@ -1,0 +1,45 @@
+--                              -*- Mode: Ada -*-
+--  Filename        : gnat.gpr
+--  Description     : GNAT make project file for the RTS.
+--  Author          : Luke A. Guest
+--  Created On      : Thu Jun 14 12:03:49 2012
+--  Licence         : See LICENCE in the root directory.
+library project gnat is
+   type Arch_Name is ("i386", "arm");
+   type Board_Name is ("pc", "rpi");
+
+   Arch  : Arch_Name  := "i386";
+   Board : Board_Name := external ("Board");
+
+   case Board is
+      when "pc" =>
+         Arch := "i386";
+      when "rpi" =>
+         Arch  := "arm";
+   end case;
+
+   for Source_Dirs use ("rts/boards/" & Arch & "/adainclude");
+   for Object_Dir use "obj"; --"rts/boards/" & Arch & "/adalib";
+
+   package Builder is
+      Basic_Switches := ("-gnat2005", "-g", "-x", "-a", "-gnatg");
+
+      case Board is
+         when "pc" =>
+            for Default_Switches ("Ada") use Basic_Switches &
+               ("-m32", "-march=i386");
+         when "rpi" =>
+            for Default_Switches ("Ada") use Basic_Switches &
+               ("-march=armv6zk", "-mfpu=vfp", "-mfloat-abi=hard", "-marm",
+                "-mcpu=arm1176jzf-s", "-mtune=arm1176jzf-s");
+      end case;
+   end Builder;
+
+   package Compiler is
+      for Default_Switches ("Ada") use ("-O2", "-ffunction-sections", "-fdata-sections");
+   end Compiler;
+
+   for Library_Kind use "static";
+   for Library_Name use "gnat-4.6";
+   for Library_Dir use "rts/boards/" & Arch & "/adalib";
+end gnat;

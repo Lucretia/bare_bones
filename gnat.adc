@@ -1,0 +1,20 @@
+--                              -*- Mode: Ada -*-
+--  Filename        : gnat.adc
+--  Description     : Project wide pragmas and restrictions.
+--  Author          : Luke A. Guest
+--  Created On      : Thu Jun 14 12:04:52 2012
+--  Licence         : See LICENCE in the root directory.
+pragma Discard_Names;
+pragma Restrictions (No_Enumeration_Maps);
+pragma Normalize_Scalars;
+--  pragma Restrictions (No_Exception_Propagation);
+pragma Restrictions (No_Exception_Handlers);
+pragma Restrictions (No_Finalization);
+pragma Restrictions (No_Tasking);
+pragma Restrictions (No_Protected_Types);
+pragma Restrictions (No_Delay);
+pragma Restrictions (No_Recursion);
+pragma Restrictions (No_Allocators);
+pragma Restrictions (No_Dispatch);
+pragma Restrictions (No_Implicit_Dynamic_Code);
+pragma Restrictions (No_Secondary_Stack);
