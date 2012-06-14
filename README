@@ -1,0 +1,21 @@
+                              Bare Bones
+
+--------------------------------------------------------------------------------
+Introduction
+--------------------------------------------------------------------------------
+
+This source provides a complete port of the C Bare Bones tutorial from
+http://wiki.osdev.org. I copied and modified the linker script from the D port
+as the original didn't work for me and also did the same with the startup code
+from the original C port.
+
+The full documentation for this project can be found at:
+
+  http://wiki.osdev.org/Ada_Bare_bones
+
+--------------------------------------------------------------------------------
+Licence
+--------------------------------------------------------------------------------
+
+The code here is released under the BSD licence, I have not put in licence
+indicators for the linker script or the startup code, as I didn't write those.
