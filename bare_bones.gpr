@@ -59,6 +59,6 @@ project Bare_Bones is
    package Linker is
       for Default_Switches ("Ada") use
          ("-Wl,--gc-sections", "-static", "-nostartfiles", "-nodefaultlibs",
-          "-T../src/" & Board & "/linker.ld", "-v");
+          "-T../src/" & Board & "/linker.ld");--, "-v");
    end Linker;
 end Bare_Bones;
