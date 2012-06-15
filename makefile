@@ -10,7 +10,7 @@ RTS_DIR		=	`pwd`/rts/boards/$(ARCH)
 ifeq ($(ARCH),i386)
 GNATMAKE	=	gnatmake
 AS		=	as
-ASFLAGS		=	--32 -march=i386
+ASFLAGS		=	--32 -march=i386 -g
 
 OBJS		=	obj/startup.o obj/multiboot.o obj/console.o
 BOARD		=	pc
@@ -29,8 +29,11 @@ $(OUTDIR)bare_bones: $(OBJS) src/bare_bones.adb
 obj/startup.o: src/$(BOARD)/startup.s
 	$(AS) $(ASFLAGS) src/$(BOARD)/startup.s -o obj/startup.o
 
+# To debug using GDB:
+# gdb disk/boot/bare_bones
+# target remote :1234
 qemu: boot.iso
-	qemu -cdrom boot.iso
+	qemu -s -cdrom boot.iso
 
 boot.iso: $(OUTDIR)bare_bones
 	grub-mkrescue -o boot.iso disk/
