@@ -6,10 +6,8 @@ SECTIONS
 {
     . = 0x00100000;
 
-    .text :{
-        code = .; _code = .; __code = .;
+    .text : {
         *(.text)
-        *(.rodata)
     }
 
     .rodata ALIGN (0x1000) : {
@@ -17,16 +15,19 @@ SECTIONS
     }
 
     .data ALIGN (0x1000) : {
-        data = .; _data = .; __data = .;
         *(.data)
     }
 
     .bss : {
-        sbss = .;
-        bss = .; _bss = .; __bss = .;
         *(COMMON)
         *(.bss)
-        ebss = .;
     }
-    end = .; _end = .; __end = .;
+
+    .note : {
+    	  *(.note)
+    }
+
+    .debug : {
+    	  *(.debug)
+    }
 }
