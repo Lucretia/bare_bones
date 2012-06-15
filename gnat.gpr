@@ -22,7 +22,8 @@ library project gnat is
    for Object_Dir use "obj"; --"rts/boards/" & Arch & "/adalib";
 
    package Builder is
-      Basic_Switches := ("-gnat2005", "-g", "-x", "-a", "-gnatg");
+      Basic_Switches := ("-gnat2005", "-g", "-x", "-a", "-gnatg",
+			 "-gnatec=../gnat.adc");
 
       case Board is
          when "pc" =>
