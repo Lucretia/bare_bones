@@ -9,89 +9,47 @@ with System;
 with Interfaces; use Interfaces;
 
 package Multiboot is
-   subtype Magics is Unsigned_32;
+   subtype Magic_Values is Unsigned_32;
 
-   Magic_Value : constant Magics := 16#1BAD_B002#;
-
-   ----------------------------------------------------------------------------
-   --  Multiboot header
-   ----------------------------------------------------------------------------
-   type Boot_Flags is
-      record
-         Align_Modules       : Boolean; --  Bit 0
-         Provide_Memory_Info : Boolean; --  Bit 1
-         Provide_Video_Info  : Boolean; --  Bit 2
-         Aout_Kernel         : Boolean; --  Bit 16
-      end record;
-
-   for Boot_Flags use
-      record
-         Align_Modules       at 0 range  0 ..  0;
-         Provide_Memory_Info at 0 range  1 ..  1;
-         Provide_Video_Info  at 0 range  2 ..  2;
-         Aout_Kernel         at 0 range 16 .. 16;
-      end record;
-
-   for Boot_Flags'Size use 32;
-
-   type Memory_Info (Present : Boolean) is
-      record
-         case Present is
-            when True =>
-               Header_Addr   : Unsigned_32;
-               Load_Addr     : Unsigned_32;
-               Load_End_Addr : Unsigned_32;
-               BSS_End_Addr  : Unsigned_32;
-               Entry_Addr    : Unsigned_32;
-            when False =>
-               null;
-         end case;
-      end record;
-
-   pragma Unchecked_Unions (Memory_Info);
-
-   type Video_Info (Present : Boolean) is
-      record
-         case Present is
-            when True =>
-               Mode_Type : Unsigned_32;
-               Width     : Unsigned_32;
-               Height    : Unsigned_32;
-               Depth     : Unsigned_32;
-            when False =>
-               null;
-         end case;
-      end record;
-
-   pragma Unchecked_Unions (Video_Info);
-
-   --  This header isn't really required to be accessed from the kernel,
-   --  it's here more for completeness of the multiboot spec.
-   type Header is
-      record
-         Magic    : Magics;  --  Must equal Magic_Value, above.
-         Flags    : Boot_Flags;
-         Checksum : Unsigned_32;
-         Memory   : Memory_Info (Flags.Provide_Memory_Info);
-         Video    : Video_Info  (Flags.Aout_Kernel);
-      end record;
-
-   --  This is defined in startup.s before the kernel entry point.
-   MB_Header : Header;
-
-   pragma Import (Asm, MB_Header, "mb_header");
-
-   --  Header_Address : System.Address;
-   --  pragma Import (Assembly, Header_Address, "mb_header");
-
-   --  MB_Header : Header;
-
-   --  for MB_Header'Address use Header_Address;
-   --  pragma Volatile (MB_Header);
+   Magic_Value : constant Magic_Values := 16#2BAD_B002#;
 
    ----------------------------------------------------------------------------
    --  Multiboot information.
    ----------------------------------------------------------------------------
+   type Features is
+      record
+         Memory               : Boolean; --  Bit 0
+         Boot_Device          : Boolean; --  Bit 1
+         Command_Line         : Boolean; --  Bit 2
+         Modules              : Boolean; --  Bit 3
+         Symbol_Table         : Boolean; --  Bit 4 - this is Aout only.
+         Section_Header_Table : Boolean; --  Bit 5 - this is ELF only.
+         BIOS_Memory_Map      : Boolean; --  Bit 6
+         Drives               : Boolean; --  Bit 7
+         ROM_Configuration    : Boolean; --  Bit 8
+         Boot_Loader          : Boolean; --  Bit 9
+         APM_Table            : Boolean; --  Bit 10
+         Graphics_Table       : Boolean; --  Bit 11
+      end record;
+
+   for Features use
+      record
+         Memory               at 0 range 0 .. 0;
+         Boot_Device          at 0 range 1 .. 1;
+         Command_Line         at 0 range 2 .. 2;
+         Modules              at 0 range 3 .. 3;
+         Symbol_Table         at 0 range 4 .. 4;
+         Section_Header_Table at 0 range 5 .. 5;
+         BIOS_Memory_Map      at 0 range 6 .. 6;
+         Drives               at 0 range 7 .. 7;
+         ROM_Configuration    at 1 range 0 .. 0;
+         Boot_Loader          at 1 range 1 .. 1;
+         APM_Table            at 1 range 2 .. 2;
+         Graphics_Table       at 1 range 3 .. 3;
+      end record;
+
+   for Features'Size use 32;
+
    type Memory_Info is
       record
          Upper : Unsigned_32;
@@ -142,65 +100,39 @@ package Multiboot is
 
    type MB_Info is
       record
-         Flags             : Unsigned_32;
-         Memory            : Memory_Info;
-         --  Mem_Upper         : Unsigned_32;
-         --  Mem_Lower         : Unsigned_32;
-         Boot_Device       : Unsigned_32;
-         Cmd_Line          : Unsigned_32;
-         Modules           : Modules_Info;
-         --  Mods_Count        : Unsigned_32;
-         --  Mods_Addr         : Unsigned_32;
-         --  Syms1             : Unsigned_32;
-         --  Syms2             : Unsigned_32;
-         --  Syms3             : Unsigned_32;
-         --  Syms4             : Unsigned_32;
-	 Symbols           : Symbols_Array;
-         Memory_Map        : Memory_Map_Info;
-         --  MMap_Length       : Unsigned_32;
-         --  MMap_Addr         : Unsigned_32;
-         Drives            : Drives_Info;
-         --  Drives_Length     : Unsigned_32;
-         --  Drives_Addr       : Unsigned_32;
-         Config_Table      : Unsigned_32;
-         Boot_Loader_Name  : Unsigned_32;
-         APM_Table         : Unsigned_32;
-         --  VBE_Control_Info  : Unsigned_32;
-         --  VBE_Mode_Info     : Unsigned_32;
-         --  VBE_Mode          : Unsigned_32;
-         --  VBE_Interface_Seg : Unsigned_32;
-         --  VBE_Interface_Off : Unsigned_32;
-         --  VBE_Interface_Len : Unsigned_32;
-         VBE               : VBE_Info;
+         Flags            : Features;
+         Memory           : Memory_Info;
+         Boot_Device      : Unsigned_32;
+         Cmd_Line         : Unsigned_32;
+         Modules          : Modules_Info;
+         Symbols          : Symbols_Array;
+         Memory_Map       : Memory_Map_Info;
+         Drives           : Drives_Info;
+         Config_Table     : Unsigned_32;
+         Boot_Loader_Name : Unsigned_32;
+         APM_Table        : Unsigned_32;
+         VBE              : VBE_Info;
       end record;
-   
+
    pragma Convention (C, MB_Info);
 
    --  We need to import the "mbd" symbol...
-   Info_Address : System.Address;
+   Info_Address : constant Unsigned_32;
 
    pragma Import (Assembly, Info_Address, "mbd");
 
-   Info : MB_Info;
+   Info : constant MB_Info;
 
-   -- So we can use the address stored at that location.
-   for Info'Address use Info_Address;
+   --  So we can use the address stored at that location.
+   for Info'Address use System'To_Address (Info_Address);
 
-   pragma Volatile (MB_Info);
+   pragma Volatile (Info);
+   pragma Import (C, Info);
 
    ----------------------------------------------------------------------------
    --  Magic number.
    ----------------------------------------------------------------------------
+   Magic : constant Magic_Values;
 
-   --  We need to import the "magic" symbol...
-   Magic_Address : System.Address;
-
-   pragma Import (Assembly, Magic_Address, "magic");
-
-   Magic : Magics;  --  This should also match Magic_Value, above.
-
-   -- So we can use the address stored at that location.
-   for Magic'Address use Magic_Address;
-
-   pragma Volatile (Magic);
+   pragma Import (Assembly, Magic, "magic");
 end Multiboot;
