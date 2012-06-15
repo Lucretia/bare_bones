@@ -7,8 +7,9 @@
 pragma Discard_Names;
 pragma Restrictions (No_Enumeration_Maps);
 pragma Normalize_Scalars;
---  pragma Restrictions (No_Exception_Propagation);
-pragma Restrictions (No_Exception_Handlers);
+pragma Restrictions (No_Exception_Propagation);
+--  pragma Restrictions (No_Exception_Registration);
+--  pragma Restrictions (No_Exception_Handlers);
 pragma Restrictions (No_Finalization);
 pragma Restrictions (No_Tasking);
 pragma Restrictions (No_Protected_Types);
