@@ -22,6 +22,12 @@ ln -s `pwd`/rts/src/$f `pwd`/rts/boards/i386/adainclude/$f
 done
 
 --------------------------------------------------------------------------------
+Prerequisites
+--------------------------------------------------------------------------------
+To test using make QEMU, you will need GRUB 2 installed for the grub-mkrescue
+command. This command also uses xorriso - which I had to install separately.
+
+--------------------------------------------------------------------------------
 Licence
 --------------------------------------------------------------------------------
 
