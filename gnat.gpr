@@ -22,7 +22,7 @@ library project gnat is
    for Object_Dir use "obj"; --"rts/boards/" & Arch & "/adalib";
 
    package Builder is
-      Basic_Switches := ("-gnat2005", "-g", "-x", "-a", "-gnatg",
+      Basic_Switches := ("-gnat2005", "-O0", "-g3", "-x", "-a", "-gnatg",
 			 "-gnatec=../gnat.adc");
 
       case Board is
@@ -37,7 +37,8 @@ library project gnat is
    end Builder;
 
    package Compiler is
-      for Default_Switches ("Ada") use ("-O2", "-ffunction-sections", "-fdata-sections");
+      for Default_Switches ("Ada") use
+	("-O0",	"-g3", "-ffunction-sections", "-fdata-sections");
    end Compiler;
 
    for Library_Kind use "static";

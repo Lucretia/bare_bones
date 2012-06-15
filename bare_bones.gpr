@@ -25,7 +25,7 @@ project Bare_Bones is
    for Main use ("bare_bones.adb");
 
    package Builder is
-      Basic_Switches := ("-gnat2005", "-g", "-x", "-a", "-gnatg",
+      Basic_Switches := ("-gnat2005", "-O0", "-g", "-x", "-a", "-gnatg",
                          "-gnatec=../gnat.adc", "-gnaty-I", "-gnaty+d");
 
       case Board is
@@ -43,10 +43,10 @@ project Bare_Bones is
       case Board is
          when "pc" =>
             for Default_Switches ("Ada") use
-               ("-O0", "-g", "-ggdb", "-ffunction-sections", "-fdata-sections");
+               ("-O0", "-g3", "-ggdb", "-ffunction-sections", "-fdata-sections");
          when "rpi" =>
             for Default_Switches ("Ada") use
-               ("-O0", "-g", "-ggdb", "-ffunction-sections", "-fdata-sections");
+               ("-O0", "-g3", "-ggdb", "-ffunction-sections", "-fdata-sections");
 
       end case;
    end Compiler;
