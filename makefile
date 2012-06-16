@@ -5,7 +5,8 @@
 #  Created On      : Thu Jun 14 11:59:53 2012
 #  Licence         : See LICENCE in the root directory.
 ARCH		=	i386
-RTS_DIR		=	`pwd`/rts/boards/$(ARCH)
+PWD		=	$(shell pwd)
+RTS_DIR		=	$(PWD)/rts/boards/$(ARCH)
 
 ifeq ($(ARCH),i386)
 GNATMAKE	=	gnatmake
