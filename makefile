@@ -29,11 +29,17 @@ $(OUTDIR)bare_bones: $(OBJS) src/bare_bones.adb
 obj/startup.o: src/$(BOARD)/startup.s
 	$(AS) $(ASFLAGS) src/$(BOARD)/startup.s -o obj/startup.o
 
+# This will start qemu, but then stop the emulation, press ctrl+alt+shift+f2
+# to get to the console, press c to continue once GDB has been configured. For
+# more on QEMU's monitor, see http://en.wikibooks.org/wiki/QEMU/Monitor
+#
 # To debug using GDB:
-# gdb disk/boot/bare_bones
-# target remote :1234
+# ./gdb-qemu.sh
+qemud: boot.iso
+	qemu -S -s -cdrom boot.iso
+
 qemu: boot.iso
-	qemu -s -cdrom boot.iso
+	qemu -cdrom boot.iso
 
 boot.iso: $(OUTDIR)bare_bones
 	grub-mkrescue -o boot.iso disk/
