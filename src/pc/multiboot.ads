@@ -88,7 +88,7 @@ package Multiboot is
    pragma Convention (C, Memory_Info);
 
    ----------------------------------------------------------------------------
-   --  Loadabble module information.
+   --  Loadable module information.
    ----------------------------------------------------------------------------
    type Modules is
       record
@@ -112,11 +112,20 @@ package Multiboot is
          First : System.Address;
       end record;
 
+   ----------------------------------------------------------------------------
+   --  Symbols information.
+   ----------------------------------------------------------------------------
    pragma Convention (C, Modules_Info);
 
+   type Symbols_Variant is (Aout, ELF);
+
+   function Get_Symbols_Variant return Symbols_Variant;
+
    ----------------------------------------------------------------------------
-   --  Symbol table: a.out
-   --  TODO: This can be implemented by anyone who wants to use aout.
+   --  a.out symbols or ELF sections
+   --
+   --  TODO: a.out only - This can be implemented by anyone who wants to use
+   --  aout.
    --
    --  From what I can tell from the spec, Addr points to a size followed by
    --  an array of a.out nlist structures. This is then followed by a size
@@ -125,28 +134,24 @@ package Multiboot is
    --
    --  Table_Size and String_Size are the same as the ones listed above.
    ----------------------------------------------------------------------------
-   type Aout_Symbols is
+   type Symbols (Variant : Symbols_Variant := ELF) is
       record
-         Table_Size  : Unsigned_32;
-         String_Size : Unsigned_32;
-         Addr        : System.Address;
-         Reserved    : Unsigned_32;     --  Always 0.
+         case Variant is
+            when Aout =>
+               Table_Size  : Unsigned_32;
+               String_Size : Unsigned_32;
+               Aout_Addr   : System.Address;
+               Reserved    : Unsigned_32;     --  Always 0.
+            when ELF =>
+               Number      : Unsigned_32;
+               Size        : Unsigned_32;
+               ELF_Addr    : System.Address;
+               Shndx       : Unsigned_32;
+         end case;
       end record;
 
-   pragma Convention (C, Aout_Symbols);
-
-   ----------------------------------------------------------------------------
-   --  ELF Section table information.
-   ----------------------------------------------------------------------------
-   type ELF_Sections is
-      record
-         Number : Unsigned_32;
-         Size   : Unsigned_32;
-         Addr   : System.Address;
-         Shndx  : Unsigned_32;
-      end record;
-
-   pragma Convention (C, ELF_Sections);
+   pragma Convention (C, Symbols);
+   pragma Unchecked_Union (Symbols);
 
    ----------------------------------------------------------------------------
    --  Memory map information.
@@ -189,6 +194,7 @@ package Multiboot is
 
    ----------------------------------------------------------------------------
    --  Drives information.
+   --  TODO: Complete
    ----------------------------------------------------------------------------
    type Drives_Info is
       record
@@ -198,6 +204,31 @@ package Multiboot is
 
    pragma Convention (C, Drives_Info);
 
+   ----------------------------------------------------------------------------
+   --  APM table.
+   ----------------------------------------------------------------------------
+   type APM_Table is
+      record
+         Version         : Unsigned_16;
+         C_Seg           : Unsigned_16;
+         Offset          : Unsigned_32;
+         C_Seg_16        : Unsigned_16;
+         D_Seg           : Unsigned_16;
+         Flags           : Unsigned_16;
+         C_Seg_Length    : Unsigned_16;
+         C_Seg_16_Length : Unsigned_16;
+         D_Seg_Length    : Unsigned_16;
+      end record;
+
+   pragma Convention (C, APM_Table);
+
+   type APM_Table_Access is access APM_Table;
+
+   function Get_APM_Table return APM_Table_Access;
+
+   ----------------------------------------------------------------------------
+   --  Graphics information.
+   ----------------------------------------------------------------------------
    type VBE_Info is
       record
          Control_Info  : Unsigned_32;
@@ -210,10 +241,6 @@ package Multiboot is
 
    pragma Convention (C, VBE_Info);
 
-   type Symbols_Array is array (1 .. 4) of Unsigned_32;
-
-   pragma Convention (C, Symbols_Array);
-
    type MB_Info is
       record
          Flags            : Features;
@@ -221,12 +248,12 @@ package Multiboot is
          Boot_Device      : Boot_Devices;
          Cmd_Line         : System.Address;  --  NULL terminated C string.
          Modules          : Modules_Info;
-         Symbols          : Symbols_Array;
+         Syms             : Symbols;
          Memory_Map       : Memory_Map_Info;
          Drives           : Drives_Info;
-         Config_Table     : Unsigned_32;
-         Boot_Loader_Name : Unsigned_32;
-         APM_Table        : Unsigned_32;
+         Config_Table     : System.Address;  --  TODO: Points to BIOS table.
+         Boot_Loader_Name : System.Address;  --  NULL terminated C string.
+         APM              : System.Address;
          VBE              : VBE_Info;
       end record;
 

@@ -9,6 +9,18 @@ with System.Address_To_Access_Conversions;
 with Ada.Unchecked_Conversion;
 
 package body Multiboot is
+   function Get_Symbols_Variant return Symbols_Variant is
+   begin
+      if Info.Flags.Symbol_Table and not Info.Flags.Section_Header_Table then
+         return Aout;
+      elsif not Info.Flags.Symbol_Table and
+        Info.Flags.Section_Header_Table then
+         return ELF;
+      else
+         raise Program_Error;
+      end if;
+   end Get_Symbols_Variant;
+
    --  This forward declaration is to keep GNAT happy.
    function Unsigned_32_To_Entry_Access
      (Addr : Unsigned_32) return Memory_Map_Entry_Access;
@@ -69,4 +81,21 @@ package body Multiboot is
 
       return Unsigned_32_To_Entry_Access (Next_Addr);
    end Next_Memory_Map_Entry;
+
+   package APM_Table_Convert is new  System.Address_To_Access_Conversions
+     (Object => APM_Table_Access);
+
+   function To_APM_Table_Access is new Ada.Unchecked_Conversion
+     (Source => APM_Table_Convert.Object_Pointer,
+      Target => APM_Table_Access);
+
+   function Get_APM_Table return APM_Table_Access is
+   begin
+      if not Info.Flags.APM_Table then
+         return null;
+      end if;
+
+      return To_APM_Table_Access
+        (APM_Table_Convert.To_Pointer (Info.APM));
+   end Get_APM_Table;
 end Multiboot;
