@@ -6,6 +6,8 @@
 --  Licence         : See LICENCE in the root directory.
 with Console; use Console;
 with Multiboot; use Multiboot;
+with System.Address_To_Access_Conversions;
+with Ada.Unchecked_Conversion;
 
 use type Multiboot.Magic_Values;
 
@@ -52,6 +54,41 @@ begin
       Put ("Modules info present", Screen_Width_Range'First, Line);
 
       Line := Line + 1;
+
+      if Info.Modules.Count = 2 then
+         declare
+            type My_Modules_Array is new Modules_Array
+              (1 .. Natural (Info.Modules.Count));
+            type My_Modules_Array_Access is access all My_Modules_Array;
+
+            --  My_Modules : aliased Modules_Array
+            --    (1 .. Natural (Info.Modules.Count));
+            --  pragma Unreferenced (My_Modules);
+
+            package To_Modules is new System.Address_To_Access_Conversions
+              (Object => My_Modules_Array_Access);
+
+            function Conv is new Ada.Unchecked_Conversion
+              (Source => To_Modules.Object_Pointer,
+               Target => My_Modules_Array_Access);
+
+            Modules : constant My_Modules_Array_Access :=
+              Conv (To_Modules.To_Pointer
+                      (Info.Modules.First));
+
+            M : Multiboot.Modules;
+            pragma Unreferenced (M);
+         begin
+            Put ("2 modules loaded is correct",
+                 Screen_Width_Range'First, Line);
+
+            for I in 1 .. Info.Modules.Count loop
+               M := Modules (Natural (I));
+            end loop;
+
+            Line := Line + 1;
+         end;
+      end if;
    end if;
 
    if Info.Flags.Symbol_Table then
@@ -71,6 +108,14 @@ begin
       Put ("BIOS memory map info present", Screen_Width_Range'First, Line);
 
       Line := Line + 1;
+
+      declare
+         Map : Memory_Map_Entry_Access := Multiboot.First_Memory_Map_Entry;
+      begin
+         while Map /= null loop
+            Map := Multiboot.Next_Memory_Map_Entry (Map);
+         end loop;
+      end;
    end if;
 
    if Info.Flags.Drives then
