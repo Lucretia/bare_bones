@@ -13,6 +13,8 @@ package Multiboot is
 
    Magic_Value : constant Magic_Values := 16#2BAD_B002#;
 
+   type MB_Info;
+
    ----------------------------------------------------------------------------
    --  Multiboot information.
    ----------------------------------------------------------------------------
@@ -50,6 +52,33 @@ package Multiboot is
 
    for Features'Size use 32;
 
+   ----------------------------------------------------------------------------
+   --  Boot device information.
+   ----------------------------------------------------------------------------
+   type Boot_Devices is
+      record
+         Drive       : Unsigned_8;
+         Partition_1 : Unsigned_8;
+         Partition_2 : Unsigned_8;
+         Partition_3 : Unsigned_8;
+      end record;
+
+   for Boot_Devices use
+      record
+         Drive       at 0 range 0 .. 7;
+         Partition_1 at 1 range 0 .. 7;
+         Partition_2 at 2 range 0 .. 7;
+         Partition_3 at 3 range 0 .. 7;
+      end record;
+
+   for Boot_Devices'Size use 32;
+
+   Invalid_Partition : constant Unsigned_8 := 16#ff#;
+
+   ----------------------------------------------------------------------------
+   --  Memory information.
+   --  These values are in KB
+   ----------------------------------------------------------------------------
    type Memory_Info is
       record
          Upper : Unsigned_32;
@@ -58,13 +87,86 @@ package Multiboot is
 
    pragma Convention (C, Memory_Info);
 
+   ----------------------------------------------------------------------------
+   --  Loadabble module information.
+   ----------------------------------------------------------------------------
+   type Modules is
+      record
+         First    : System.Address; --  Address of module start .. end.
+         Last     : System.Address;
+         Data     : System.Address; --  NULL terminated C string.
+         Reserved : Unsigned_32;    --  Should be 0.
+      end record;
+
+   type Modules_Array is array (Natural range <>) of Modules;
+
+   pragma Convention (C, Modules_Array);
+
+   --  type Modules_Array_Access is access Modules_Array;
+
+   --  pragma Convention (C, Modules_Array_Access);
+
    type Modules_Info is
       record
          Count : Unsigned_32;
-         Addr  : Unsigned_32;
+         First : System.Address;
       end record;
 
    pragma Convention (C, Modules_Info);
+
+   ----------------------------------------------------------------------------
+   --  Symbol table: a.out
+   --  TODO: This can be implemented by anyone who wants to use aout.
+   --
+   --  From what I can tell from the spec, Addr points to a size followed by
+   --  an array of a.out nlist structures. This is then followed by a size
+   --  of a set of strings, then the sizeof (unsigned), then the strings
+   --  (NULL terminated).
+   --
+   --  Table_Size and String_Size are the same as the ones listed above.
+   ----------------------------------------------------------------------------
+   type Aout_Symbols is
+      record
+         Table_Size  : Unsigned_32;
+         String_Size : Unsigned_32;
+         Addr        : System.Address;
+         Reserved    : Unsigned_32;     --  Always 0.
+      end record;
+
+   pragma Convention (C, Aout_Symbols);
+
+   ----------------------------------------------------------------------------
+   --  ELF Section table information.
+   ----------------------------------------------------------------------------
+   type ELF_Sections is
+      record
+         Number : Unsigned_32;
+         Size   : Unsigned_32;
+         Addr   : System.Address;
+         Shndx  : Unsigned_32;
+      end record;
+
+   pragma Convention (C, ELF_Sections);
+
+   ----------------------------------------------------------------------------
+   --  Memory map information.
+   ----------------------------------------------------------------------------
+   type Memory_Type is range Unsigned_32'First .. Unsigned_32'Last;
+
+   for Memory_Type'Size use 32;
+
+   Memory_Available : constant Memory_Type := 1;
+   Memory_Reserved  : constant Memory_Type := 2;
+
+   type Memory_Map_Entry is
+      record
+         Size            : Unsigned_32;
+         Base_Address    : Long_Long_Integer;
+         Length_In_Bytes : Long_Long_Integer;
+         Sort            : Memory_Type;
+      end record;
+
+   type Memory_Map_Entry_Access is access Memory_Map_Entry;
 
    type Memory_Map_Info is
       record
@@ -74,6 +176,20 @@ package Multiboot is
 
    pragma Convention (C, Memory_Map_Info);
 
+   ----------------------------------------------------------------------------
+   --  Returns null on failure or if the memory map doesn't exist.
+   ----------------------------------------------------------------------------
+   function First_Memory_Map_Entry return Memory_Map_Entry_Access;
+
+   ----------------------------------------------------------------------------
+   --  Returns null on failure or if we have seen all of the memory map.
+   ----------------------------------------------------------------------------
+   function Next_Memory_Map_Entry
+     (Current : Memory_Map_Entry_Access) return Memory_Map_Entry_Access;
+
+   ----------------------------------------------------------------------------
+   --  Drives information.
+   ----------------------------------------------------------------------------
    type Drives_Info is
       record
          Length : Unsigned_32;
@@ -102,8 +218,8 @@ package Multiboot is
       record
          Flags            : Features;
          Memory           : Memory_Info;
-         Boot_Device      : Unsigned_32;
-         Cmd_Line         : Unsigned_32;
+         Boot_Device      : Boot_Devices;
+         Cmd_Line         : System.Address;  --  NULL terminated C string.
          Modules          : Modules_Info;
          Symbols          : Symbols_Array;
          Memory_Map       : Memory_Map_Info;
