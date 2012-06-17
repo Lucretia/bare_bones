@@ -5,11 +5,22 @@
 --  Created On      : Thu Jun 14 11:59:53 2012
 --  Licence         : See LICENCE in the root directory.
 project Bare_Bones is
-   type Arch_Name is ("i386", "arm");
+   type Build_Name is ("debug", "release");
+   type Bug_Name   is ("bug", "clean");
    type Board_Name is ("pc", "rpi");
+   type Arch_Name  is ("none", "i386", "arm");
 
-   Arch  : Arch_Name  := "i386";
+   Build : Build_Name := external ("Build");
+   Bug   : Bug_Name   := external ("Bug");
    Board : Board_Name := external ("Board");
+   Arch  : Arch_Name  := "none";
+       
+   case Board is
+      when "pc" =>
+         Arch := "i386";
+      when "rpi" =>
+         Arch := "arm";
+   end case;
 
    -- TODO: Add in a case statement that adds an arch dir to source.
 
@@ -25,40 +36,113 @@ project Bare_Bones is
    for Main use ("bare_bones.adb");
 
    package Builder is
-      Basic_Switches := ("-gnat2005", "-O0", "-g", "-x", "-a", "-gnatg",
-                         "-gnatec=../gnat.adc", "-gnaty-I", "-gnaty+d");
-
+      Basic_Switches :=
+	("-gnat2005", "-x", "-a", "-gnatg", "-gnatec=../gnat.adc", "-gnaty-I",
+	 "-gnaty+d");
+      
+      Builder_Build_Switches := ("");
+      Builder_Bug_Switches   := ("");
+      Builder_Board_Switches := ("");
+      
+      case Build is
+         when "debug" =>
+            Builder_Build_Switches := ("-g", "-O0");
+         when "release" =>
+            Builder_Build_Switches := ("-O2");
+      end case;
+      
+      case Bug is
+         when "bug" =>
+            Builder_Bug_Switches := ("-gnatd.n");
+         when "clean" =>
+            Builder_Bug_Switches := ("");
+      end case;
+      
       case Board is
          when "pc" =>
-            for Default_Switches ("Ada") use Basic_Switches &
-               ("-m32", "-march=i386");
+	    Builder_Board_Switches := ("-m32", "-march=i386");
+               
          when "rpi" =>
-            for Default_Switches ("Ada") use Basic_Switches &
-               ("-march=armv6zk", "-mfpu=vfp", "-mfloat-abi=hard", "-marm",
+	    Builder_Board_Switches :=
+	      ("-march=armv6zk", "-mfpu=vfp", "-mfloat-abi=hard", "-marm",
                 "-mcpu=arm1176jzf-s", "-mtune=arm1176jzf-s");
       end case;
+      
+      for Default_Switches ("Ada") use
+	Basic_Switches & Builder_Build_Switches &
+	Builder_Bug_Switches & Builder_Board_Switches;
    end Builder;
 
    package Compiler is
+      Basic_Switches := ("-ffunction-sections", "-fdata-sections");
+      
+      Compiler_Build_Switches := ("");
+      Compiler_Bug_Switches   := ("");
+      Compiler_Board_Switches := ("");
+      
+      case Build is
+         when "debug" =>
+            Compiler_Build_Switches  := ("-g", "-O0", "-g3", "-ggdb");
+         when "release" =>
+            Compiler_Build_Switches  := ("-O2");
+      end case;
+      
+      case Bug is
+         when "bug" =>
+            Compiler_Bug_Switches  := ("-v");
+         when "clean" =>
+            Compiler_Bug_Switches  := ("");
+      end case;
+      
       case Board is
          when "pc" =>
-            for Default_Switches ("Ada") use
-               ("-O0", "-g3", "-ggdb", "-ffunction-sections", "-fdata-sections");
+	    Compiler_Board_Switches := ("");
          when "rpi" =>
-            for Default_Switches ("Ada") use
-               ("-O0", "-g3", "-ggdb", "-ffunction-sections", "-fdata-sections");
-
+	    Compiler_Board_Switches := ("");
       end case;
+      
+      for Default_Switches ("Ada") use
+	Basic_Switches & Compiler_Build_Switches & Compiler_Bug_Switches &
+	Compiler_Board_Switches;
    end Compiler;
 
 --   package Binder is
 --      for Default_Switches ("Ada") use ("-m32");
 --   end Binder;
 
-   -- To reduce size of final binary.
    package Linker is
+      Basic_Switches :=
+	("-static", "-nostartfiles", "-nodefaultlibs",
+	 "-T../src/" & Board & "/linker.ld");
+      
+      Linker_Build_Switches := ("");
+      Linker_Bug_Switches   := ("");
+      Linker_Board_Switches := ("");
+      
+      case Build is
+         when "debug" =>
+            Linker_Build_Switches  := ("");
+         when "release" =>
+            -- To reduce size of final binary, strip out unused sections.
+            Linker_Build_Switches  := ("-Wl,--gc-sections");
+      end case;
+      
+      case Bug is
+         when "bug" =>
+            Linker_Bug_Switches  := ("-v");
+         when "clean" =>
+            Linker_Bug_Switches  := ("");
+      end case;
+      
+      case Board is
+         when "pc" =>
+	    Linker_Board_Switches := ("");
+         when "rpi" =>
+	    Linker_Board_Switches := ("");
+      end case;
+      
       for Default_Switches ("Ada") use
-         ("-Wl,--gc-sections", "-static", "-nostartfiles", "-nodefaultlibs",
-          "-T../src/" & Board & "/linker.ld");--, "-v");
+	Basic_Switches & Linker_Build_Switches & Linker_Bug_Switches &
+	Linker_Board_Switches;
    end Linker;
 end Bare_Bones;

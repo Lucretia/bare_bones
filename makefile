@@ -5,15 +5,24 @@
 #  Created On      : Thu Jun 14 11:59:53 2012
 #  Licence         : See LICENCE in the root directory.
 ARCH		=	i386
+BUILD		=	debug
+#BUILD		=	release
+
+# The next option is for when there is a bug box and we need to build with
+# extra options so we can file a bug.
+#BUG		=	bug
+BUG		=	clean
+
 PWD		=	$(shell pwd)
 RTS_DIR		=	$(PWD)/rts/boards/$(ARCH)
 
 ifeq ($(ARCH),i386)
 GNATMAKE	=	gnatmake
 AS		=	as
-ASFLAGS		=	--32 -march=i386 -g
+ASFLAGS		=	--32 -march=i386
 
-OBJS		=	obj/startup.o obj/multiboot.o obj/console.o
+OBJS		=	obj/startup.o \
+			obj/multiboot.o
 BOARD		=	pc
 
 OUTDIR		=	disk/boot/
@@ -22,10 +31,19 @@ OUTDIR		=	disk/boot/
 
 endif
 
+ifeq ($(BUILD),debug)
+ASFLAGS		+=	-g
+else
+ifeq ($(BUILD),release)
+endif
+endif
+
 all: $(OUTDIR)bare_bones
 
 $(OUTDIR)bare_bones: $(OBJS) src/bare_bones.adb
-	$(GNATMAKE) --RTS=$(RTS_DIR) -XBoard=$(BOARD) -Pbare_bones.gpr
+	$(GNATMAKE) --RTS=$(RTS_DIR) \
+		-XBoard=$(BOARD) -XBuild=$(BUILD) -XBug=$(BUG) \
+		-Pbare_bones.gpr
 
 obj/startup.o: src/$(BOARD)/startup.s
 	$(AS) $(ASFLAGS) src/$(BOARD)/startup.s -o obj/startup.o
@@ -48,5 +66,5 @@ boot.iso: $(OUTDIR)bare_bones
 .PHONY: clean
 
 clean:
-	-rm obj/* *~ bare_bones bare_bones.bin
+	-rm obj/* *~ bare_bones
 
