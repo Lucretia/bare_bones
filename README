@@ -36,33 +36,7 @@ $ sudo apt-get install qemu xorriso
 Bugs
 --------------------------------------------------------------------------------
 
-The inability to declare local exceptions has been filed:
-  http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53684
-
-  This has been refuted by Eric Botcazou where he states that we need to
-  provide a custom Ada.Exceptions package, so I have created one, as can be
-  see:
-
-  https://github.com/Lucretia/bare_bones/blob/master/rts/src/a-except.ads
-  https://github.com/Lucretia/bare_bones/blob/master/rts/src/a-except.adb
-
-  This works as long as you don't try to catch any exceptions locally, at which
-  point practically everything gives a warning:
-
-  bare_bones.adb:25:17: warning: pragma Restrictions (No_Exception_Propagation) in effect
-  bare_bones.adb:25:17: warning: "Constraint_Error" may call Last_Chance_Handler
-  ...
-  bare_bones.adb:150:20: warning: "Constraint_Error" may call Last_Chance_Handler
-  bare_bones.adb:153:04: warning: pragma Restrictions (No_Exception_Propagation) in effect
-  bare_bones.adb:153:04: warning: Last_Chance_Handler will be called on exception
-  bare_bones.adb:162:04: warning: pragma Restrictions (No_Exception_Propagation) in effect
-  bare_bones.adb:162:04: warning: this handler can never be entered, and has been removed
-  bare_bones.adb:162:09: violation of restriction "No_Exception_Propagation" at ../gnat.adc:10
-  gnatmake: "/home/laguest/src/mine/bare_bones/src/bare_bones.adb" compilation error
-  make: *** [disk/boot/bare_bones] Error 4
-
-  So the net effect of not bothering and only using the language defined
-  exceptions for bare metal programming.
+None at present.
 
 --------------------------------------------------------------------------------
 Licence
