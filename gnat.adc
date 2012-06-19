@@ -4,6 +4,7 @@
 --  Author          : Luke A. Guest
 --  Created On      : Thu Jun 14 12:04:52 2012
 --  Licence         : See LICENCE in the root directory.
+--  pragma Restrictions (No_Obsolescent_Features);
 pragma Discard_Names;
 pragma Restrictions (No_Enumeration_Maps);
 pragma Normalize_Scalars;
@@ -63,3 +64,11 @@ pragma Restrictions (Max_Select_Alternatives => 0);
 pragma Restrictions (Max_Task_Entries => 0);
 pragma Restrictions (Max_Tasks => 0);
 pragma Restrictions (Max_Asynchronous_Select_Nesting => 0);
+
+--  pragma Restrictions (No_Floating_Point);
+pragma Restrictions (No_Standard_Storage_Pools);
+
+
+--  I'm not sure about this one, needs to be tested fully with data with
+--  initialisers to be certain.
+pragma Restrictions (No_Default_Initialization);
