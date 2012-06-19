@@ -5,32 +5,32 @@
 --  Created On      : Thu Jun 14 11:59:53 2012
 --  Licence         : See LICENCE in the root directory.
 pragma Restrictions (No_Obsolescent_Features);
---  with Console; use Console;
---  with Multiboot; use Multiboot;
+with Console; use Console;
+with Multiboot; use Multiboot;
 --  with System.Address_To_Access_Conversions;
 --  with Ada.Unchecked_Conversion;
 
---  use type Multiboot.Magic_Values;
+use type Multiboot.Magic_Values;
 
 procedure Bare_Bones is
-   --  Line : Screen_Height_Range := Screen_Height_Range'First;
+   Line : Screen_Height_Range := Screen_Height_Range'First;
 begin
    null;
-   --  Clear;
+   Clear;
 
-   --  Put ("Hello, bare bones in Ada",
-   --       Screen_Width_Range'First,
-   --       Line);
+   Put ("Hello, bare bones in Ada",
+        Screen_Width_Range'First,
+        Line);
 
-   --  Line := Line + 1;
+   Line := Line + 1;
 
-   --  if Magic = Magic_Value then
-   --     Put ("Magic numbers match!", Screen_Width_Range'First, Line);
-   --  else
-   --     Put ("Magic numbers don't match!", Screen_Width_Range'First, Line);
+   if Magic = Magic_Value then
+      Put ("Magic numbers match!", Screen_Width_Range'First, Line);
+   else
+      Put ("Magic numbers don't match!", Screen_Width_Range'First, Line);
 
-   --     raise Program_Error;
-   --  end if;
+      raise Program_Error;
+   end if;
 
    --  Line := Line + 1;
 

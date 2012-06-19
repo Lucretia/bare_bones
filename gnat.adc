@@ -66,7 +66,7 @@ pragma Restrictions (Max_Tasks => 0);
 pragma Restrictions (Max_Asynchronous_Select_Nesting => 0);
 
 --  pragma Restrictions (No_Floating_Point);
-pragma Restrictions (No_Standard_Storage_Pools);
+--  pragma Restrictions (No_Standard_Storage_Pools);
 
 
 --  I'm not sure about this one, needs to be tested fully with data with

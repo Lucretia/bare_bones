@@ -38,7 +38,12 @@ AS_FLAGS	=	--32 -march=$(ARCH)
 AS_OBJS		=	obj/startup.o
 ADA_OBJS	=	obj/multiboot.o
 
-OUTDIR		=	disk/boot/
+IMAGE		=	boot.iso
+QEMU		=	qemu
+QEMU_FLAGS	=	-s -cdrom $(IMAGE)
+QEMUD_FLAGS	=	-S $(QEMU_FLAGS)
+
+OUTDIR		=	out/disk/boot/
 else
 ifeq ($(BOARD),rpi)
 ARCH		=	arm
@@ -68,12 +73,15 @@ ifeq ($(BUILD),release)
 endif
 endif
 
+# The final output filename.
+TARGET		=	$(OUTDIR)bare_bones-$(ARCH).elf
+
 ###############################################################################
 # Rules.
 ###############################################################################
-all: $(OUTDIR)bare_bones
+all: $(TARGET)
 
-$(OUTDIR)bare_bones: $(OBJS) src/bare_bones.adb
+$(TARGET): $(OBJS) src/bare_bones.adb
 	$(TOOL_PREFIX)$(GNATMAKE) --RTS=$(RTS_DIR) \
 		-XBoard=$(BOARD) -XBuild=$(BUILD) -XBug=$(BUG) \
 		-Pbare_bones.gpr
@@ -87,17 +95,18 @@ obj/startup.o: src/$(BOARD)/startup.s
 #
 # To debug using GDB:
 # ./gdb-qemu.sh
-qemud: boot.iso
-	qemu -S -s -cdrom boot.iso
+qemud: $(IMAGE)
+	$(QEMU) $(QEMUD_FLAGS)
 
-qemu: boot.iso
-	qemu -cdrom boot.iso
+qemu: $(IMAGE)
+	$(QEMU) $(QEMU_FLAGS)
 
-boot.iso: $(OUTDIR)bare_bones
-	grub-mkrescue -o boot.iso disk/
+# The PC boot.iso image that qemu uses.
+boot.iso: $(TARGET)
+	grub-mkrescue -o boot.iso out/disk/
 
 .PHONY: clean
 
 clean:
-	-rm obj/* *~ bare_bones
+	-rm obj/* *~ $(TARGET)
 

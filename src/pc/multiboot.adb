@@ -70,7 +70,7 @@ package body Multiboot is
       Current_Addr : constant Unsigned_32 := To_Unsigned_32
         (Convert.To_Address
            (To_Object_Pointer (Current)));
-      Next_Addr    : Unsigned_32;
+      Next_Addr    : Unsigned_32 := Unsigned_32'First;
    begin
       if  Current_Addr >= Info.Memory_Map.Addr + Info.Memory_Map.Length then
          return null;

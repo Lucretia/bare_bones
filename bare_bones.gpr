@@ -14,6 +14,7 @@ project Bare_Bones is
    Bug   : Bug_Name   := external ("Bug");
    Board : Board_Name := external ("Board");
    Arch  : Arch_Name  := "none";
+   Out_Dir := "";
 
    case Board is
       when "pc" =>
@@ -27,12 +28,16 @@ project Bare_Bones is
    case Board is
       when "pc" =>
          for Source_Dirs use ("src", "src/pc");
+
+         Out_Dir := "./out/disk/boot/";
       when "rpi" =>
          for Source_Dirs use ("src", "src/rpi");
+
+         Out_Dir := "./out/";
    end case;
 
    for Object_Dir use "obj";
-   for Exec_Dir use "./disk/boot/";
+   for Exec_Dir use Out_Dir;
    for Main use ("bare_bones.adb");
 
    package Builder is
@@ -44,6 +49,8 @@ project Bare_Bones is
       Builder_Build_Switches := ("");
       Builder_Bug_Switches   := ("");
       Builder_Board_Switches := ("");
+
+      for Executable ("bare_bones.adb") use "bare_bones-" & Arch & ".elf";
 
       case Build is
          when "debug" =>
