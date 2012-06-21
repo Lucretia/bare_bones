@@ -42,5 +42,6 @@ None at present.
 Licence
 --------------------------------------------------------------------------------
 
-The code here is released under the BSD licence, I have not put in licence
-indicators for the linker script or the startup code, as I didn't write those.
+As advised in the forum sticky on osdev.org, the code here is released under
+the CC0 license (http://creativecommons.org/publicdomain/zero/1.0/),placing this
+work under public domain with no copyright.
