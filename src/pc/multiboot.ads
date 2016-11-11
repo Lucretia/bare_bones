@@ -277,5 +277,7 @@ package Multiboot is
    ----------------------------------------------------------------------------
    Magic : constant Magic_Values;
 
+   pragma Warnings (Off);
    pragma Import (Assembly, Magic, "magic");
+   pragma Warnings (On);
 end Multiboot;

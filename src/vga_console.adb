@@ -1,11 +1,11 @@
 --                              -*- Mode: Ada -*-
---  Filename        : console.adb
+--  Filename        : vga_console.adb
 --  Description     : Implementation of a console for PC using VGA text mode.
 --  Author          : Luke A. Guest
 --  Created On      : Thu Jun 14 12:09:31 2012
 --  Licence         : See LICENCE in the root directory.
 -------------------------------------------------------------------------------
-package body Console is
+package body VGA_Console is
    procedure Put
      (Char       : Character;
       X          : Screen_Width_Range;
@@ -19,11 +19,11 @@ package body Console is
    end Put;
 
    procedure Put
-      (Str        : String;
-       X          : Screen_Width_Range;
-       Y          : Screen_Height_Range;
-       Foreground : Foreground_Colour := White;
-       Background : Background_Colour := Black) is
+     (Str        : String;
+      X          : Screen_Width_Range;
+      Y          : Screen_Height_Range;
+      Foreground : Foreground_Colour := White;
+      Background : Background_Colour := Black) is
    begin
       for Index in Str'First .. Str'Last loop
          Put (Str (Index),
@@ -94,4 +94,4 @@ package body Console is
          end loop;
       end loop;
    end Clear;
-end Console;
+end VGA_Console;

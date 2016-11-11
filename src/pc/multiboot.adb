@@ -14,7 +14,8 @@ package body Multiboot is
       if Info.Flags.Symbol_Table and not Info.Flags.Section_Header_Table then
          return Aout;
       elsif not Info.Flags.Symbol_Table and
-        Info.Flags.Section_Header_Table then
+        Info.Flags.Section_Header_Table
+      then
          return ELF;
       else
          raise Program_Error;
@@ -48,7 +49,7 @@ package body Multiboot is
      (Addr : Unsigned_32) return Memory_Map_Entry_Access is
    begin
       return To_Entry_Access (Convert.To_Pointer
-        (To_Address (Addr)));
+                              (To_Address (Addr)));
    end Unsigned_32_To_Entry_Access;
 
    function First_Memory_Map_Entry return Memory_Map_Entry_Access is

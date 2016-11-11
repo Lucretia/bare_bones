@@ -1,5 +1,5 @@
 --                              -*- Mode: Ada -*-
---  Filename        : console.ads
+--  Filename        : vga_console.ads
 --  Description     : Definition of a console for PC using VGA text mode.
 --  Author          : Luke A. Guest
 --  Created On      : Thu Jun 14 12:08:58 2012
@@ -7,8 +7,8 @@
 -------------------------------------------------------------------------------
 with System;
 
-package Console is
-   pragma Preelaborate (Console);
+package VGA_Console is
+   pragma Preelaborate (VGA_Console);
 
    TE : exception;
    type Background_Colour is
@@ -130,4 +130,4 @@ package Console is
    --     Background : in Background_Colour := Black);
 
    procedure Clear (Background : Background_Colour := Black);
-end Console;
+end VGA_Console;

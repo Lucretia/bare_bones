@@ -4,114 +4,81 @@
 --  Author          : Luke A. Guest
 --  Created On      : Thu Jun 14 11:59:53 2012
 --  Licence         : See LICENCE in the root directory.
-project Bare_Bones is
-   type Build_Name is ("debug", "release");
-   type Bug_Name   is ("bug", "clean");
-   type Board_Name is ("pc", "rpi");
-   type Arch_Name  is ("none", "i386", "arm");
+with "common.gpr";
 
-   Build : Build_Name := external ("Build");
-   Bug   : Bug_Name   := external ("Bug");
-   Board : Board_Name := external ("Board");
-   Arch  : Arch_Name  := "none";
+project Bare_Bones is
+   for Source_Dirs use (Common.Source_Dir & "/src", Common.Source_Dir & "/src/" & Common.Board);
+
    Out_Dir := "";
 
-   case Board is
+   case Common.Board is
       when "pc" =>
-         Arch := "i386";
+         Out_Dir := Common.Build_Dir & "/disk/boot/";
       when "rpi" =>
-         Arch := "arm";
+         Out_Dir := Common.Build_Dir;
    end case;
 
-   -- TODO: Add in a case statement that adds an arch dir to source.
-
-   case Board is
-      when "pc" =>
-         for Source_Dirs use ("src", "src/pc");
-
-         Out_Dir := "./out/disk/boot/";
-      when "rpi" =>
-         for Source_Dirs use ("src", "src/rpi");
-
-         Out_Dir := "./out/";
-   end case;
-
-   for Object_Dir use "obj";
+   for Object_Dir use Common.Build_Dir & "/.obj";
    for Exec_Dir use Out_Dir;
    for Main use ("bare_bones.adb");
 
    package Builder is
-      Basic_Switches :=
-        ("-gnat05", "-x", "-a", "-gnatg", "-gnatec=../gnat.adc", "-gnaty-I",
-         "-gnaty+d");
+      Ada_Switches := ("-gnat2012", "-x", "-a", "-gnatg", "-gnatec=../../../../gnat.adc", "-gnaty-I",
+                       "-gnaty+d");
       --, "-fstack-check");
 
-      Builder_Build_Switches := ("");
-      Builder_Bug_Switches   := ("");
-      Builder_Board_Switches := ("");
+      for Executable ("bare_bones.adb") use "bare_bones-" & Common.Arch;
+      for Executable_Suffix use ".elf";
 
-      for Executable ("bare_bones.adb") use "bare_bones-" & Arch & ".elf";
-
-      case Build is
+      case Common.Mode is
          when "debug" =>
-            Builder_Build_Switches := ("-g", "-O0");
+            Ada_Switches := Ada_Switches & ("-g", "-O0");
          when "release" =>
-            Builder_Build_Switches := ("-O2");
+            Ada_Switches := Ada_Switches & ("-O2");
       end case;
 
-      case Bug is
+      case Common.Bug is
          when "bug" =>
-            Builder_Bug_Switches := ("-gnatd.n");
+            Ada_Switches := Ada_Switches & ("-gnatd.n");
          when "clean" =>
-            Builder_Bug_Switches := ("");
+            null;
       end case;
 
-      case Board is
+      case Common.Board is
          when "pc" =>
-            Builder_Board_Switches := ("-m32", "-march=i386");
+            Ada_Switches := Ada_Switches & ("-m32", "-march=i386");
 
          when "rpi" =>
-            Builder_Board_Switches :=
-              ("-march=armv6zk", "-mfpu=vfp", "-mfloat-abi=hard", "-marm",
-                "-mcpu=arm1176jzf-s", "-mtune=arm1176jzf-s");
+            Ada_Switches := Ada_Switches & ("-march=armv6zk", "-mfpu=vfp", "-mfloat-abi=hard", "-marm",
+                                            "-mcpu=arm1176jzf-s", "-mtune=arm1176jzf-s");
       end case;
 
-      for Default_Switches ("Ada") use
-        Basic_Switches & Builder_Build_Switches &
-        Builder_Bug_Switches & Builder_Board_Switches;
+      for Default_Switches ("Ada") use Ada_Switches;
    end Builder;
 
    package Compiler is
-      Basic_Switches := ("-ffunction-sections", "-fdata-sections");
+      Ada_Switches := ("-ffunction-sections", "-fdata-sections");
 
-      Compiler_Build_Switches := ("");
-      Compiler_Bug_Switches   := ("");
-      Compiler_Board_Switches := ("");
-
-      case Build is
+      case Common.Mode is
          when "debug" =>
-            Compiler_Build_Switches  := ("-g", "-O0", "-g3", "-ggdb");
+            Ada_Switches  := Ada_Switches & ("-g", "-O0", "-g3", "-ggdb");
          when "release" =>
-            Compiler_Build_Switches  := ("-O2");
+            Ada_Switches  := Ada_Switches & ("-O2");
       end case;
 
-      case Bug is
+      case Common.Bug is
          when "bug" =>
-            Compiler_Bug_Switches  := ("-v");
+            Ada_Switches  := Ada_Switches & ("-v");
          when "clean" =>
-            Compiler_Bug_Switches  := ("");
+            null;
       end case;
 
-      case Board is
-         when "pc" =>
-            Compiler_Board_Switches := ("");
-         when "rpi" =>
-            Compiler_Board_Switches := ("");
+      case Common.Board is
+         when others =>
+            null;
       end case;
 
-      for Default_Switches ("Ada") use
-        Basic_Switches & Compiler_Build_Switches & Compiler_Bug_Switches &
-        Compiler_Board_Switches;
+      for Default_Switches ("Ada") use Ada_Switches;
    end Compiler;
 
    package Binder is
@@ -119,38 +86,29 @@ project Bare_Bones is
    end Binder;
 
    package Linker is
-      Basic_Switches :=
-        ("-static", "-nostartfiles", "-nodefaultlibs",
-         "-T../src/" & Board & "/linker.ld");
+      Linker_Switches := ("-static", "-nostartfiles", "-nodefaultlibs",
+                          "-T../../../../" & Common.Source_Dir & "/src/" & Common.Board & "/linker.ld");
 
-      Linker_Build_Switches := ("");
-      Linker_Bug_Switches   := ("");
-      Linker_Board_Switches := ("");
-
-      case Build is
+      case Common.Mode is
          when "debug" =>
-            Linker_Build_Switches  := ("");
+            null;
          when "release" =>
             -- To reduce size of final binary, strip out unused sections.
-            Linker_Build_Switches  := ("-Wl,--gc-sections");
+            Linker_Switches  := Linker_Switches & ("-Wl,--gc-sections");
       end case;
 
-      case Bug is
+      case Common.Bug is
          when "bug" =>
-            Linker_Bug_Switches  := ("-v");
+            Linker_Switches  := Linker_Switches & ("-v");
          when "clean" =>
-            Linker_Bug_Switches  := ("");
+            null;
       end case;
 
-      case Board is
-         when "pc" =>
-            Linker_Board_Switches := ("");
-         when "rpi" =>
-            Linker_Board_Switches := ("");
+      case Common.Board is
+         when others =>
+            null;
       end case;
 
-      for Default_Switches ("Ada") use
-        Basic_Switches & Linker_Build_Switches & Linker_Bug_Switches &
-        Linker_Board_Switches;
+      for Default_Switches ("Ada") use Linker_Switches;
    end Linker;
 end Bare_Bones;

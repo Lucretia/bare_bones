@@ -4,44 +4,33 @@
 --  Author          : Luke A. Guest
 --  Created On      : Thu Jun 14 12:03:49 2012
 --  Licence         : See LICENCE in the root directory.
-library project gnat is
-   type Arch_Name is ("i386", "arm");
-   type Board_Name is ("pc", "rpi");
+with "common.gpr";
 
-   Arch  : Arch_Name  := "i386";
-   Board : Board_Name := external ("Board");
-
-   case Board is
-      when "pc" =>
-         Arch := "i386";
-      when "rpi" =>
-         Arch  := "arm";
-   end case;
-
-   for Source_Dirs use ("rts/boards/" & Arch & "/adainclude");
-   for Object_Dir use "obj"; --"rts/boards/" & Arch & "/adalib";
+library project RTS is
+   for Source_Dirs  use (Common.Gen_Dir & "/rts/" & Common.Arch & "/adainclude");
+   for Source_Files use ("ada.ads", "a-unccon.ads", "gnat.ads", "g-souinf.ads", "interfac.ads",
+                         "s-atacco.adb", "s-atacco.adb", "s-maccod.ads", "s-stoele.adb", "s-stoele.ads",
+                         "last_chance_handler.adb", "last_chance_handler.ads");
+   for Object_Dir   use Common.Gen_Dir & "/rts/" & "/.obj";
 
    package Builder is
-      Basic_Switches := ("-gnat05", "-O0", "-g3", "-x", "-a", "-gnatg",
-			 "-gnatec=../gnat.adc", "-gnatd.n");
+      Ada_Switches := ("-gnat2012", "-O0", "-g3", "-x", "-a", "-gnatg",
+                       "-gnatec=../../../gnat.adc", "-q");--, "-gnatd.n");
 
-      case Board is
+      case Common.Board is
          when "pc" =>
-            for Default_Switches ("Ada") use Basic_Switches &
-               ("-m32", "-march=i386");
+            for Default_Switches ("Ada") use Ada_Switches & ("-m32", "-march=i386");
          when "rpi" =>
-            for Default_Switches ("Ada") use Basic_Switches &
-               ("-march=armv6zk", "-mfpu=vfp", "-mfloat-abi=hard", "-marm",
-                "-mcpu=arm1176jzf-s", "-mtune=arm1176jzf-s");
+            for Default_Switches ("Ada") use Ada_Switches & ("-march=armv6zk", "-mfpu=vfp", "-mfloat-abi=hard", "-marm",
+                                                             "-mcpu=arm1176jzf-s", "-mtune=arm1176jzf-s");
       end case;
    end Builder;
 
    package Compiler is
-      for Default_Switches ("Ada") use
-	("-O0",	"-g3", "-ffunction-sections", "-fdata-sections");
+      for Default_Switches ("Ada") use ("-O0", "-g3", "-ffunction-sections", "-fdata-sections");
    end Compiler;
 
    for Library_Kind use "static";
-   for Library_Name use "gnat-4.6";
-   for Library_Dir use "rts/boards/" & Arch & "/adalib";
-end gnat;
+   for Library_Name use "gnat";
+   for Library_Dir  use Common.Gen_Dir & "/rts/" & Common.Arch & "/adalib";
+end RTS;

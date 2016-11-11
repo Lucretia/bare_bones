@@ -5,7 +5,7 @@
 --  Created On      : Thu Jun 14 11:59:53 2012
 --  Licence         : See LICENCE in the root directory.
 pragma Restrictions (No_Obsolescent_Features);
-with Console; use Console;
+with VGA_Console; use VGA_Console;
 with Multiboot; use Multiboot;
 --  with System.Address_To_Access_Conversions;
 --  with Ada.Unchecked_Conversion;
@@ -159,12 +159,12 @@ begin
    --  Put (Natural 'Image (54),
    --       Screen_Width_Range'First,
    --       Screen_Height_Range'First + 1);
---  exception
---     when Constraint_Error =>
---        Put ("Constraint Error caught", 1, 15);
---     when Program_Error =>
---        null;
-      --  when Console.TE =>
+   --  exception
+   --     when Constraint_Error =>
+   --        Put ("Constraint Error caught", 1, 15);
+   --     when Program_Error =>
+   --        null;
+   --  when Console.TE =>
    --     Put ("TE caught", 1, 2);
 end Bare_Bones;
 pragma No_Return (Bare_Bones);
