@@ -1,0 +1,78 @@
+--                              -*- Mode: Ada -*-
+--  Filename        : common.gpr
+--  Description     : Common GNAT make project file.
+--  Author          : Luke A. Guest
+--  Created On      : Thu Jun 14 16:39:51 2016
+--  Licence         : See LICENCE in the root directory.
+abstract project Common is
+   type Mode_Name  is ("debug", "release");
+   type Bug_Name   is ("bug", "clean");
+   type Board_Name is ("pc", "rpi");
+   type Arch_Name  is ("none", "i586", "arm");
+
+   Mode  : Mode_Name  := external ("Mode");
+   Bug   : Bug_Name   := external ("Bug");
+   Board : Board_Name := external ("Board");
+   Arch  : Arch_Name  := "none";
+   CWD                := external ("CWD");
+
+   Compiler_Major    := "4.9";    --  TODO: Change this when using different compiler version.
+   Compiler_Revision := "4.9.4";  --  TODO: Change this when using different compiler version.
+   Compiler_Version  := Compiler_Major & "." & Compiler_Revision;
+   Source_Dir        := "../..";
+   Gen_Dir           := "gen";
+   Build_Dir         := Gen_Dir & "/" & Board & "/" & Mode;
+   --  Out_Dir := "";
+
+   for Source_Dirs use ();
+
+   case Board is
+      when "pc" =>
+         Arch := "i586";
+      when "rpi" =>
+         Arch := "arm";
+   end case;
+
+   package Builder is
+      Ada_Switches := ("-gnat2012", "-gnata", "-gnato", "-gnatE",
+                       "-gnaty", "-gnaty-s", "-gnatyO", "-gnaty+M120", "-gnatyx",
+                       "-gnaty+d", "-gnatv");
+   end Builder;
+
+   package Compiler is
+      Ada_Switches := ("-ffunction-sections", "-fdata-sections");
+      --                         "-gnat2012", "-gnata", "-gnato", "-gnatE",
+      --                         "-gnatyN", "-gnaty", "-gnaty-s", "-gnatyO", "-gnatyM120", "-gnatyx",
+      --                         "-gnaty+d", "-gnatv");
+      Asm_Switches := ("");
+
+      case Mode is
+         when "debug" =>
+            Ada_Switches := Ada_Switches & ("-O0", "-g");
+            Asm_Switches := Asm_Switches & ("-g");
+
+         when "release" =>
+            Ada_Switches := Ada_Switches & ("-O2");
+            Asm_Switches := Asm_Switches & ("-O", "-g");
+      end case;
+
+      case Bug is
+         when "bug" =>
+            Ada_Switches := Ada_Switches & ("-gnatd.n", "-v");
+         when others =>
+            null;
+      end case;
+
+      case Board is
+         when "pc" =>
+            Ada_Switches := Ada_Switches & ("-m32", "-march=" & Arch);
+            Asm_Switches := Asm_Switches & ("--32", "-march=" & Arch);
+         when "rpi" =>
+            Ada_Switches := Ada_Switches & ("-march=armv6zk", "-mfpu=vfp", "-mfloat-abi=hard", "-marm",
+                                            "-mcpu=arm1176jzf-s", "-mtune=arm1176jzf-s");
+      end case;
+
+      for Default_Switches ("Ada") use Ada_Switches;
+      for Default_Switches ("Asm") use Asm_Switches;
+   end Compiler;
+end Common;
