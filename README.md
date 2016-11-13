@@ -34,6 +34,9 @@ I have sudo installed on my machine:
 $ sudo emerge -av libisoburn
 ```
 
+I also used my [Free Ada](https://github.com/Lucretia/free-ada) build scripts to build useable bare metal cross
+compilers.
+
 ### GRUB
 
 ```bash
