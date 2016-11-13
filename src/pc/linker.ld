@@ -1,4 +1,4 @@
-OUTPUT_FORMAT(elf32-i586)
+OUTPUT_FORMAT(elf32-i386)
 STARTUP(startup.o)
 ENTRY (startup)
 
