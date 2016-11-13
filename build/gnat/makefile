@@ -109,7 +109,7 @@ TARGET		=	$(OUT_DIR)/bare_bones-$(ARCH).elf
 
 all: kernel
 
-kernel: $(TARGET)
+kernel: rts $(TARGET)
 
 $(TARGET): $(AS_OBJS) #src/bare_bones.adb
 	$(TOOL_PREFIX)$(GNATMAKE) -p --RTS=$(RTS_DIR) -XCWD=$(CWD) -XBoard=$(BOARD) -XMode=$(MODE) -XBug=$(BUG) \
@@ -137,25 +137,30 @@ setup-rts:
 #
 # To debug using GDB:
 # ./gdb-qemu.sh
-qemud: $(IMAGE)
+qemud: image
 	$(QEMU) $(QEMUD_FLAGS)
 
-qemu: $(IMAGE)
+qemu: image
 	$(QEMU) $(QEMU_FLAGS)
 
 # The PC boot.iso image that qemu uses.
-.phony: image image-$(ARCH)
+.phony: image image-$(ARCH) grub-cfg
 
-image: image-$(ARCH)
+image: kernel grub-cfg image-$(ARCH)
 
 image-$(ARCH): $(IMAGE)
 
 # PC (x86) boot disk image for qemu.
-$(IMAGE): $(TARGET)
-	$(GRUB_DIR)/bin/grub-mkrescue -o $(IMAGE) -v $(DISK_DIR)
+$(IMAGE):
+	$(GRUB_DIR)/bin/grub-mkrescue -o $(IMAGE) $(DISK_DIR) 2> /dev/null
+
+grub-cfg:
+	-mkdir $(OUT_DIR)/grub
+	-cp grub-pc.cfg $(OUT_DIR)/grub/grub.cfg
 
 .PHONY: clean
 
 clean:
-	-rm obj/* *~ $(TARGET)
+	-rm -rf $(GEN_DIR)/rts
+	-rm -rf gen/$(BOARD)
 
