@@ -39,6 +39,33 @@ $ sudo apt-get install qemu xorriso
 $ emerge -av libisoburn
 ```
 
+### GRUB
+
+```bash
+$ git clone git://git.savannah.gnu.org/grub.git
+$ cd grub
+$ ./autogen.sh
+$ mkdir ../other/build-grub && cd ../other/build-grub
+$ ../grub/configure --prefix=`pwd`/../../gen/grub --target=i586-elf
+$ make -j4
+$ make install
+```
+
+## Booting the kernel
+
+### PC (x86)
+
+```bash
+$ make qemu
+```
+
+This will boot qemu and stop at the GRUB command prompt, then type the following:
+
+```bash
+multiboot /boot/bare_bones-i586.elf
+boot
+```
+
 ## Bugs
 
 None at present.
