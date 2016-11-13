@@ -10,16 +10,9 @@ from the original C port.
 The full documentation and build instructions for this project can be found
 [here](http://wiki.osdev.org/Ada_Bare_bones).
 
-Once you have cloned this repository, you need to set up the links to the
-RTS inside ```rts/boards/i386/adainclude/``` to point to those in ```rts/src/``` as follows:
-
 ```bash
-for f in "ada.ads" "a-unccon.ads" "a-uncdea.ads" "gnat.ads" "g-souinf.ads" \
-"interfac.ads" "s-atacco.adb" "s-atacco.ads" "s-maccod.ads" "s-stoele.adb" \
-"s-stoele.ads"
-do
-ln -s `pwd`/rts/src/$f `pwd`/rts/boards/i386/adainclude/$f
-done
+$ git clone https://github.com/Lucretia/bare_bones.git
+$ cd bare_bones/buid/gnat
 ```
 
 ## Prerequisites
@@ -35,8 +28,10 @@ $ sudo apt-get install qemu xorriso
 
 ### Gentoo
 
+I have sudo installed on my machine:
+
 ```bash
-$ emerge -av libisoburn
+$ sudo emerge -av libisoburn
 ```
 
 ### GRUB
@@ -53,17 +48,8 @@ $ make install
 
 ## Booting the kernel
 
-### PC (x86)
-
 ```bash
-$ make qemu
-```
-
-This will boot qemu and stop at the GRUB command prompt, then type the following:
-
-```bash
-multiboot /boot/bare_bones-i586.elf
-boot
+$ make [qemu|qemud]
 ```
 
 ## Bugs
