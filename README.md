@@ -52,7 +52,70 @@ $ make install
 ## Booting the kernel
 
 ```bash
-$ make [qemu|qemud]
+$ make qemu
+```
+
+## Debugging the kernel
+
+In one shell, type the following:
+
+```bash
+$ make qemud
+```
+
+Then in another shell, type:
+
+```bash
+$ ./gdb-qemu.sh
+```
+
+Boot the kernel within QEMU and GDB will break into the kernel at the main program. e.g.:
+
+```bash
+$ ./gdb-qemu.sh
+GNU gdb (Gentoo 7.10.1 vanilla) 7.10.1
+Copyright (C) 2015 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-pc-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<https://bugs.gentoo.org/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from gen/pc/debug/disk/boot/bare_bones-i586.elf...done.
+0x0000fff0 in ?? ()
+Breakpoint 1 at 0x100c20: file /home/laguest/src/mine/bare_bones/src/bare_bones.adb, line 15.
+
+
+Breakpoint 1, bare_bones () at /home/laguest/src/mine/bare_bones/src/bare_bones.adb:15
+15	procedure Bare_Bones is
+(gdb)
+(gdb) bt
+#0  bare_bones () at /home/laguest/src/mine/bare_bones/src/bare_bones.adb:15
+(gdb) list
+10	--  with System.Address_To_Access_Conversions;
+11	--  with Ada.Unchecked_Conversion;
+12
+13	use type Multiboot.Magic_Values;
+14
+15	procedure Bare_Bones is
+16	   Line : Screen_Height_Range := Screen_Height_Range'First;
+17	begin
+18	   null;
+19	   Clear;
+(gdb) q
+A debugging session is active.
+
+	Inferior 1 [Remote target] will be detached.
+
+Quit anyway? (y or n) y
+Detaching from program: /home/laguest/src/mine/bare_bones/build/gnat/gen/pc/debug/disk/boot/bare_bones-i586.elf, Remote target
+Ending remote debugging.
 ```
 
 ## Bugs
