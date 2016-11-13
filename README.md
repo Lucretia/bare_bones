@@ -2,13 +2,14 @@
 
 ## Introduction
 
-This source provides a complete port of the C Bare Bones tutorial from
-http://wiki.osdev.org. I copied and modified the linker script from the D port
-as the original didn't work for me and also did the same with the startup code
-from the original C port.
+This source provides a complete port of the C Bare Bones tutorial from http://wiki.osdev.org. I copied and modified the
+linker script from the D port as the original didn't work for me and also did the same with the startup code from the
+original C port.
 
 The full documentation and build instructions for this project can be found
 [here](http://wiki.osdev.org/Ada_Bare_bones).
+
+**Note** I am currently in the process of updating this repository.
 
 ```bash
 $ git clone https://github.com/Lucretia/bare_bones.git
@@ -125,6 +126,26 @@ None at present.
 ## Who did this?
 
 Luke A. Guest
+
+## Future
+
+I intend to get this very basic kernel building on a number of boards that I have lying around:
+
+* Raspberry Pi (original version)
+* Pandaboard
+* Arduino Uno
+* ChipKit Uno32
+* STM32F4-Discovery
+* MSP430 Launchpad
+
+This will show that Ada 2012 can be built and booted directly on top of any type type of board from small limited
+devices and upwards.
+
+### Ada features to add
+
+* Port to Ada 2012.
+* Secondary stack so that indefinite types can be returned easily.
+* Move runtime building to [Free Ada](https://github.com/Lucretia/free-ada).
 
 ## Licence
 
