@@ -44,12 +44,15 @@ AS_FLAGS	=	--32 -march=$(ARCH)
 AS_OBJS		=	$(OBJ_DIR)/startup.o
 #ADA_OBJS	=	obj/multiboot.o
 
-IMAGE		=	boot.iso
-QEMU		=	qemu
+IMAGE		=	$(BUILD_DIR)/boot.iso
+QEMU		=	qemu-system-i386
 QEMU_FLAGS	=	-s -cdrom $(IMAGE)
 QEMUD_FLAGS	=	-S $(QEMU_FLAGS)
 
-IMAGE_DIR	=	$(BUILD_DIR)/disk/boot/
+DISK_DIR	=	$(BUILD_DIR)/disk
+OUT_DIR		=	$(DISK_DIR)/boot
+
+GRUB_DIR	=	$(GEN_DIR)/grub
 else
 ifeq ($(BOARD),rpi)
 ARCH		=	arm
@@ -97,7 +100,7 @@ endif
 endif
 
 # The final output filename.
-TARGET		=	$(IMAGE_DIR)bare_bones-$(ARCH).elf
+TARGET		=	$(OUT_DIR)/bare_bones-$(ARCH).elf
 
 ###############################################################################
 # Rules.
@@ -141,12 +144,18 @@ qemu: $(IMAGE)
 	$(QEMU) $(QEMU_FLAGS)
 
 # The PC boot.iso image that qemu uses.
-boot.iso: $(TARGET)
-	grub-mkrescue -o boot.iso out/disk/
+.phony: image image-$(ARCH)
+
+image: image-$(ARCH)
+
+image-$(ARCH): $(IMAGE)
+
+# PC (x86) boot disk image for qemu.
+$(IMAGE): $(TARGET)
+	$(GRUB_DIR)/bin/grub-mkrescue -o $(IMAGE) -v $(DISK_DIR)
 
 .PHONY: clean
 
 clean:
 	-rm obj/* *~ $(TARGET)
-
 
