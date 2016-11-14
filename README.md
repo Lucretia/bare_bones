@@ -13,7 +13,7 @@ The full documentation and build instructions for this project can be found
 
 ```bash
 $ git clone https://github.com/Lucretia/bare_bones.git
-$ cd bare_bones/buid/gnat
+$ cd bare_bones/build/gnat
 ```
 
 ## Prerequisites
@@ -37,6 +37,8 @@ $ sudo emerge -av libisoburn
 
 I also used my [Free Ada](https://github.com/Lucretia/free-ada) build scripts to build useable bare metal cross
 compilers.
+
+## x86
 
 ### GRUB
 
