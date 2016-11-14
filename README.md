@@ -43,11 +43,13 @@ compilers.
 ### GRUB
 
 ```bash
+$ mkdir -p others/{build,source}
+$ cd others/source
 $ git clone git://git.savannah.gnu.org/grub.git
 $ cd grub
 $ ./autogen.sh
-$ mkdir ../other/build-grub && cd ../other/build-grub
-$ ../grub/configure --prefix=`pwd`/../../gen/grub --target=i586-elf
+$ mkdir ../../build/grub && cd ../../build/grub
+$ ../../source/grub/configure --prefix=`pwd`/../../../gen/pc/grub --target=i586-elf
 $ make -j4
 $ make install
 ```
@@ -60,13 +62,13 @@ $ make qemu
 
 ## Debugging the kernel
 
-In one shell, type the following:
+From the ```build/gnat``` directory, in one shell, type the following:
 
 ```bash
 $ make qemud
 ```
 
-Then in another shell, type:
+then in another shell, type:
 
 ```bash
 $ ./gdb-qemu.sh
