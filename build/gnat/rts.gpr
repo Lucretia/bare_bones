@@ -10,6 +10,8 @@ library project RTS is
    for Source_Dirs  use (Common.Gen_Dir & "/rts/" & Common.Arch & "/adainclude");
    for Source_Files use ("ada.ads", "a-unccon.ads", "gnat.ads", "g-souinf.ads", "interfac.ads",
                          "s-atacco.adb", "s-atacco.adb", "s-maccod.ads", "s-stoele.adb", "s-stoele.ads",
+                         "s-secsta.adb", "s-secsta.ads",
+                         "memory.adb", "memory.ads",
                          "last_chance_handler.adb", "last_chance_handler.ads");
    for Object_Dir   use Common.Gen_Dir & "/rts/" & "/.obj";
 

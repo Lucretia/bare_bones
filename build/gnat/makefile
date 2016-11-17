@@ -11,7 +11,7 @@
 ###############################################################################
 BOARD		=	pc
 MODE		=	debug
-#BUILD		=	release
+#MODE		=	release
 
 # The next option is for when there is a bug box and we need to build with
 # extra options so we can file a bug.
@@ -72,6 +72,7 @@ endif
 RTS_VER			=	$(shell gcc -dumpversion | cut -f1,2 -d.)
 RTS_SRC_DIR		=	$(CWD)/rts/$(RTS_VER)/adainclude
 RTS_ARCH_SRC_DIR	=	$(RTS_SRC_DIR)/arch/$(ARCH)
+RTS_COMMON_SRC_DIR	=	$(CWD)/rts/common/adainclude
 RTS_SRCS		=	ada.ads \
 				a-unccon.ads \
 				a-uncdea.ads \
@@ -87,6 +88,10 @@ RTS_SRCS		=	ada.ads \
 				s-stoele.adb
 
 RTS_ARCH_SRCS		=	system.ads
+RTS_COMMON_SRCS		=	memory.ads \
+				memory.adb \
+				s-secsta.ads \
+				s-secsta.adb
 RTS_DIR			=	$(GEN_DIR)/rts/$(ARCH)
 
 ###############################################################################
@@ -109,7 +114,7 @@ TARGET		=	$(OUT_DIR)/bare_bones-$(ARCH).elf
 
 all: kernel
 
-kernel: rts $(TARGET)
+kernel: $(TARGET)
 
 $(TARGET): $(AS_OBJS) #src/bare_bones.adb
 	$(TOOL_PREFIX)$(GNATMAKE) -p --RTS=$(RTS_DIR) -XCWD=$(CWD) -XBoard=$(BOARD) -XMode=$(MODE) -XBug=$(BUG) \
@@ -130,6 +135,7 @@ setup-rts:
 	-mkdir -p $(RTS_DIR)/adainclude &> /dev/null
 	-$(foreach f, $(RTS_SRCS), ln -s $(RTS_SRC_DIR)/$(f) $(RTS_DIR)/adainclude/$(f) &> /dev/null;)
 	-$(foreach f, $(RTS_ARCH_SRCS), ln -s $(RTS_ARCH_SRC_DIR)/$(f) $(RTS_DIR)/adainclude/$(f) &> /dev/null;)
+	-$(foreach f, $(RTS_COMMON_SRCS), ln -s $(RTS_COMMON_SRC_DIR)/$(f) $(RTS_DIR)/adainclude/$(f) &> /dev/null;)
 
 # This will start qemu, but then stop the emulation, press ctrl+alt+shift+f2
 # to get to the console, press c to continue once GDB has been configured. For
@@ -151,16 +157,21 @@ image: kernel grub-cfg image-$(ARCH)
 image-$(ARCH): $(IMAGE)
 
 # PC (x86) boot disk image for qemu.
-$(IMAGE):
-	$(GRUB_DIR)/bin/grub-mkrescue -o $(IMAGE) $(DISK_DIR) 2> /dev/null
+$(IMAGE): $(TARGET)
+	$(GRUB_DIR)/bin/grub-mkrescue -v -o $(IMAGE) $(DISK_DIR) 2> /dev/null
 
 grub-cfg:
 	-mkdir $(OUT_DIR)/grub
 	-cp grub-pc.cfg $(OUT_DIR)/grub/grub.cfg
 
-.PHONY: clean
+.PHONY: clean clean-rts clean-image
 
-clean:
+clean: clean-rts clean-image
+
+clean-rts:
 	-rm -rf $(GEN_DIR)/rts
+
+clean-image:
 	-rm -rf gen/$(BOARD)
+
 
