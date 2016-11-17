@@ -78,16 +78,19 @@ RTS_SRCS		=	ada.ads \
 				a-uncdea.ads \
 				gnat.ads \
 				g-souinf.ads \
+				i-c.adb i-c.ads \
 				interfac.ads \
 				s-addima.adb s-addima.ads \
+				s-addope.adb s-addope.ads \
 				s-atacco.adb s-atacco.ads \
 				s-imgint.adb s-imgint.ads \
 				s-maccod.ads \
-				s-stoele.ads s-stoele.adb
+				s-stoele.adb s-stoele.ads
 
 RTS_ARCH_SRCS		=	system.ads
 RTS_COMMON_SRCS		=	last_chance_handler.adb last_chance_handler.ads \
 				memory.ads memory.adb \
+				s-parame.ads \
 				s-secsta.ads s-secsta.adb
 RTS_DIR			=	$(GEN_DIR)/rts/$(ARCH)
 

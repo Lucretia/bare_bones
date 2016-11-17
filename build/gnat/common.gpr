@@ -48,7 +48,7 @@ abstract project Common is
 
       case Mode is
          when "debug" =>
-            Ada_Switches := Ada_Switches & ("-O0", "-g", "-gnatD", "-gnatG");
+            Ada_Switches := Ada_Switches & ("-O0", "-g"); --  , "-gnatD", "-gnatG");
             Asm_Switches := Asm_Switches & ("-g");
 
          when "release" =>

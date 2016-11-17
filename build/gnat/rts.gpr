@@ -13,17 +13,20 @@ library project RTS is
                          "a-uncdea.ads",
                          "gnat.ads",
                          "g-souinf.ads",
+                         "i-c.adb", "i-c.ads",
                          "interfac.ads",
                          "s-addima.adb", "s-addima.ads",
+                         "s-addope.adb", "s-addope.ads",
                          "s-atacco.adb", "s-atacco.ads",
                          "s-imgint.adb", "s-imgint.ads",
                          "s-maccod.ads",
                          "s-stoele.adb", "s-stoele.ads",
 
                          --  Custom packages go here.
-                         "s-secsta.adb", "s-secsta.ads",
+                         "last_chance_handler.adb", "last_chance_handler.ads",
                          "memory.adb", "memory.ads",
-                         "last_chance_handler.adb", "last_chance_handler.ads");
+                         "s-parame.ads",
+                         "s-secsta.adb", "s-secsta.ads");
    for Object_Dir   use Common.Gen_Dir & "/rts/" & "/.obj";
 
    package Builder is
