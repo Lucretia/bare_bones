@@ -22,7 +22,7 @@ pragma Restrictions (No_Recursion);
 pragma Restrictions (No_Allocators);
 pragma Restrictions (No_Dispatch);
 pragma Restrictions (No_Implicit_Dynamic_Code);
-pragma Restrictions (No_Secondary_Stack);
+--pragma Restrictions (No_Secondary_Stack);
 
 -- The following were suggested by gnatbind -r
 --pragma Restrictions (Simple_Barriers);
@@ -37,8 +37,10 @@ pragma Restrictions (No_Secondary_Stack);
 --pragma Restrictions (No_Entry_Calls_In_Elaboration_Code);
 --pragma Restrictions (No_Entry_Queue);
 --pragma Restrictions (No_Fixed_Point);
---pragma Restrictions (No_Io);
---pragma Restrictions (No_Implicit_Heap_Allocations);
+pragma Restrictions (No_IO);
+pragma Restrictions (No_Implicit_Aliasing);
+pragma Restrictions (No_Implicit_Heap_Allocations);
+--pragma Restrictions (No_Implicit_Loops);
 --pragma Restrictions (No_Initialize_Scalars);
 --pragma Restrictions (No_Local_Allocators);
 --pragma Restrictions (No_Local_Timing_Events);
