@@ -14,8 +14,18 @@ use type Multiboot.Magic_Values;
 
 procedure Bare_Bones is
    Line : Screen_Height_Range := Screen_Height_Range'First;
+
+   procedure T is
+   begin
+      Put ("T called", Screen_Width_Range'First, Line);
+   end T;
+
+   function Hello return String is
+   begin
+      return "hello!!";
+   end Hello;
 begin
-   null;
+   --     null;
    Clear;
 
    Put ("Hello, bare bones in Ada",
@@ -27,12 +37,18 @@ begin
    if Magic = Magic_Value then
       Put ("Magic numbers match!", Screen_Width_Range'First, Line);
    else
-      Put ("Magic numbers don't match!", Screen_Width_Range'First, Line);
+      Put ("Magic numbers don't match!", Screen_Width_Range'First, Line);  --  comment
 
       raise Program_Error;
    end if;
 
-   --  Line := Line + 1;
+   Line := Line + 1;
+
+   T;
+
+   Line := Line + 1;
+
+   Put (Hello, Screen_Width_Range'First, Line);
 
    --  if Info.Flags.Memory then
    --     Put ("Memory info present", Screen_Width_Range'First, Line);
@@ -167,4 +183,4 @@ begin
    --  when Console.TE =>
    --     Put ("TE caught", 1, 2);
 end Bare_Bones;
-pragma No_Return (Bare_Bones);
+--  pragma No_Return (Bare_Bones);
