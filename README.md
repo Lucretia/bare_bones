@@ -56,7 +56,10 @@ $ make install
 
 ## Booting the kernel
 
+The ```qemu``` target will also make the kernel image and boot.iso.
+
 ```bash
+$ make rts
 $ make qemu
 ```
 
