@@ -23,8 +23,8 @@ project Bare_Bones is
    for Main use ("bare_bones.adb");
 
    package Builder is
-      Ada_Switches := ("-gnat2012", "-x", "-a", "-gnatg", "-gnatec=../../../../gnat.adc", "-gnaty-I",
-                       "-gnaty+d");
+      Ada_Switches := Common.Builder.Ada_Switches & ("-gnat2012", "-x", "-a", "-gnatg", "-gnatec=../../../../gnat.adc",
+                                                     "-gnaty-I", "-gnaty+d");
       --, "-fstack-check");
 
       for Executable ("bare_bones.adb") use "bare_bones-" & Common.Arch;
@@ -57,7 +57,7 @@ project Bare_Bones is
    end Builder;
 
    package Compiler is
-      Ada_Switches := ("-ffunction-sections", "-fdata-sections");
+      Ada_Switches := Common.Compiler.Ada_Switches;
 
       case Common.Mode is
          when "debug" =>
@@ -81,9 +81,11 @@ project Bare_Bones is
       for Default_Switches ("Ada") use Ada_Switches;
    end Compiler;
 
-   --     package Binder is
-   --        for Default_Switches ("Ada") use ("-r");
-   --     end Binder;
+   package Binder is
+      --           for Default_Switches ("Ada") use ("-r");
+      --           for Default_Switches ("Ada") use ("-n", "-z", "-a");
+      for Default_Switches ("Ada") use ("-D1k");
+   end Binder;
 
    package Linker is
       Linker_Switches := ("-static", "-nostartfiles", "-nodefaultlibs",
