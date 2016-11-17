@@ -8,15 +8,15 @@
 
 procedure Last_Chance_Handler
   (Source_Location : System.Address; Line : Integer) is
-   pragma Unreferenced (Source_Location, Line);
+
+   procedure Crash (Source_Location : System.Address; Line : Integer) with
+     Import     => True,
+     Convention => Ada;
 begin
    --  TODO: Add in code to dump the info to serial/screen which
    --  is obviously board specific.
    --     Put ("Exception raised",
    --          Screen_Width_Range'First,
    --          Screen_Height_Range'Last);
-
-   loop
-      null;
-   end loop;
+   Crash (Source_Location => Source_Location, Line => Line);
 end Last_Chance_Handler;
