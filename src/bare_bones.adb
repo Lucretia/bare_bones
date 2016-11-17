@@ -5,8 +5,10 @@
 --  Created On      : Thu Jun 14 11:59:53 2012
 --  Licence         : See LICENCE in the root directory.
 pragma Restrictions (No_Obsolescent_Features);
-with VGA_Console; use VGA_Console;
+with Crash;
+pragma Unreferenced (Crash);
 with Multiboot; use Multiboot;
+with VGA_Console; use VGA_Console;
 --  with System.Address_To_Access_Conversions;
 --  with Ada.Unchecked_Conversion;
 
@@ -49,6 +51,8 @@ begin
    Line := Line + 1;
 
    Put (Hello, Screen_Width_Range'First, Line);
+
+   raise Program_Error;
 
    --  if Info.Flags.Memory then
    --     Put ("Memory info present", Screen_Width_Range'First, Line);
