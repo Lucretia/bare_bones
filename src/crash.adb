@@ -40,9 +40,10 @@ procedure Crash (Source_Location : System.Address; Line : Integer) is
 
    type Source_Chars is new C.char_array (0 .. Source_Length);
 
-   package To_Source is new System.Address_To_Access_Conversions (Object => Source_Chars);
-
-   Source_Str    : constant String := C.To_Ada (C.char_array (To_Source.To_Pointer (Source_Location).all));
+   C_Str         : Source_Chars with
+     Address => Source_Location;
+   pragma Import (Convention => Ada, Entity => C_Str);
+   Source_Str    : constant String := C.To_Ada (C.char_array (C_Str));
 begin
    Put (Str        => "** Kernel crashed at: " & Source_Str & ":" & Integer'Image (Line) & " **",
         X          => 1,
