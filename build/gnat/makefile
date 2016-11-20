@@ -69,7 +69,7 @@ endif
 ###############################################################################
 #.PHONY: $(ADA_OBJS)
 
-RTS_VER			=	$(shell gcc -dumpversion | cut -f1,2 -d.)
+RTS_VER			=	$(shell $(TOOL_PREFIX)gcc -dumpversion | cut -f1,2 -d.)
 RTS_SRC_DIR		=	$(CWD)/rts/$(RTS_VER)/adainclude
 RTS_ARCH_SRC_DIR	=	$(RTS_SRC_DIR)/arch/$(ARCH)
 RTS_COMMON_SRC_DIR	=	$(CWD)/rts/common/adainclude
